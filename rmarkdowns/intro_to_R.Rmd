@@ -36,6 +36,9 @@ One of the most helpful tools to an R programmer are R packages! In a nutshell, 
 ```{r}
 library()
 ```
+```{r}
+library()
+```
 
 A new window should have opened up with a list of packages and a short description! 
 
@@ -97,6 +100,12 @@ Let's practice creating some variables:
 my_name <- "Victoria DelaCruz" # character strings are stored within quotations
 my_name # run the name of your variable to see the output
 ```
+```{r}
+my_name <-"Maria Moses"
+```
+```{r}
+my_name <-"Maria Moses"
+```
 
 2. my_age
 ```{r}
@@ -104,9 +113,47 @@ my_age = 20 # numeric values do not need any quotations
 my_age # run the name of your variable to see the output
 my_age + 5 # how old will you be in 5 years?
 ```
+```{r}
+my_age=45
+my_age + 5
+```
+```{r}
+my_age = 45
+```
+```{r}
+my_age = 45
+my_age + 5
+```
 
+
+```{r}
+rm(my_age)
+```
+```{r}
+my_age = 45
+```
+```{r}
+my_age + 5
+```
+
+
+```{r}
+my_age + 5
+```
+
+
+```{r}
+```rm(my_name)
+```
+```{r}
+rm(my_name)
+```{r}
+rm(my_age)
+```
+```{r}
+rm(my_age)
 #### <span style="color: red;">Challenge 1</span>
-Create a my_name variable with your name assigned to the variable instead of "Victoria DelaCruz". Then, create a my_age variable with your age. 
+Create a my_name variable with your name assigned to the variable instead of "Victoria DelaCruz". Then, create a my_age variable with your age. instainst
 
 #### Different Types of Data
 
@@ -250,7 +297,7 @@ library(naniar) # helpful package to view missing data
 Note: if you run into an error loading the `naniar` package, run the install.packages() code in the console that we went through earlier
 
 ```{r}
-sdr_data %>% 
+sdrssdr_data %>% 
   miss_var_summary() %>% 
   arrange(desc(pct_miss))
 ```
@@ -285,6 +332,17 @@ Select is a function used to subset or select columns in your R data frame. Let'
 ```{r}
 sdr_data %>% 
   select(goal_3_score, goal_4_score)
+```{r}
+sdr_data %>%
+  select(goal_5_score, goal_9_score)
+```
+```{r}
+sdr_data %>%
+  select(goal_5_score, goal_9_score)
+```
+```{r}
+sdr_data %>%
+select(goal_5_score, goal_9_score)
 ```
 
 You'll notice we used the pipe operator ` %>% ` after the name of the dataframe, and then listed the columns we were interested in the select() function
@@ -303,6 +361,10 @@ In order to do this, we write out the column name "regions_used_for_the_sdr" fol
 ```{r}
 sdr_data %>% 
   filter(regions_used_for_the_sdr == "Oceania")
+```
+```{r}
+sdr_data %>%
+  filter(regions_used_for_the_sdr == "MENA")
 ```
 
 Notes: 
