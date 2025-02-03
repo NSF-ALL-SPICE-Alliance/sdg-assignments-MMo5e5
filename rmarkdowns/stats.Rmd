@@ -197,12 +197,15 @@ To circle back and reinforce how the linear regression (line drawn through our s
   - What does this look like on scatter plot?
   
 ```{r, warning=FALSE, message=FALSE}
-ggplot(sdr_data, aes(x = goal_12_score, 
-                     y = goal_9_score)) +
+correlation_goal <- ggplot(sdr_data, aes(x = goal_5_score, 
+                     y = goal_9_score, label = country)) +
   geom_point() +
   geom_smooth() +
   stat_cor() +
   theme_minimal() 
+
+ggplotly (correlation_goal)
+
 
 ```
 
@@ -216,7 +219,8 @@ ggplot(sdr_data, aes(x = goal_12_score,
      - **Hint** to use the ggplotly() function, you will need to use `library()` to load in the plotly package in the first code chunk in this R Markdown
 
   - in 4-6 sentences, come up with a hypotheses for the positive or negative correlation between the 2 goals
-      
+      Based on my hypothesis, there seems to both positive and negative correlation between the SDG goal 5 and goal 9.  The United States seems to have a positive correlation for SDG goal 9 versus goal 5.  Sweden shows both positive correlation for both goals.  Countries such as Somalia, Chad and Afghanistan are leaning more on a negative for both SDG goals. 
       - are there any points that don't follow the trend (outliers)
-        
+        Yes. 
         - which country(s) are outliers?
+        Yemen
