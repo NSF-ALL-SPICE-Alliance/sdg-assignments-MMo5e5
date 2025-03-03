@@ -1,0 +1,280 @@
+---
+title: "Final Project"
+author: "Maria Moses"
+date: "2025-02-24"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+Load in Packages used in the analysis
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(leaflet)
+library(plotly)
+```
+
+
+Read in Data
+
+```{r}
+sdr_data <- read_csv(here("data/SDR-2023-Data.csv"))
+```
+
+
+```{r}
+sdr_data_sids <- read_csv(here("data/SDR-for-SIDS/SIDS-SDR-2023-data.csv"))
+```
+Clean column names of our dataframe
+
+```{r}
+sdr_data_sids <- sdr_data_sids %>%
+  clean_names()
+```
+
+```{r}
+sdr_data <- sdr_data %>%
+  clean_names()
+```
+
+```{r}
+sdr_data %>%
+  filter(country == "Singapore")
+```
+```{r}
+Singapore_SDR<-sdr_data %>%
+  filter(country == "Singapore")
+```
+```{r}
+sdr_data_sids %>%
+  filter(country == "Singapore")
+```
+```{r}
+Singapore_SID<-sdr_data %>%
+  filter(country == "Singapore")
+```
+```{r}
+Singapore_SDR%>%
+  select(country,goal_1_score,goal_2_score,goal_3_score,goal_4_score,goal_5_score,goal_6_score,goal_7_score,goal_8_score,goal_10_score,goal_11_score,goal_12_score,goal_13_score,goal_14_score,goal_15_score,goal_16_score,goal_17_score)%>%
+  pivot_longer(cols = -country, names_to = "Goal")
+```
+```{r}
+SDR_Goal_Score_Summary <-Singapore_SDR%>%
+  select(country,goal_1_score,goal_2_score,goal_3_score,goal_4_score,goal_5_score,goal_6_score,goal_7_score,goal_8_score,goal_10_score,goal_11_score,goal_12_score,goal_13_score,goal_14_score,goal_15_score,goal_16_score,goal_17_score)%>%
+  pivot_longer(cols = -country, names_to = "Goal")
+```
+
+```{r}
+SDR_Goal_Score_Summary[order(SDR_Goal_Score_Summary$value,SDR_Goal_Score_Summary$Goal),]
+```
+```{r}
+sdr_data %>% 
+  filter(regions_used_for_the_sdr == "East & South Asia")
+```
+```{r}
+E_S_Asia <-sdr_data%>%
+  filter(regions_used_for_the_sdr == "East & South Asia")
+```
+
+```{r}
+E_S_Asia[order(E_S_Asia$x2023_sdg_index_rank,E_S_Asia$x2023_sdg_index_score),]
+```
+```{r}
+ggplot(E_S_Asia, aes(x= goal_3_score, y = country)) +
+  geom_bar(stat = "identity")+
+  labs(title = "Distributions of SDG 3 Scores",
+       x = "SDG 3 Score",
+       y = "Countries",
+       fill = "Country")
+```
+
+```{r}
+ggplot(E_S_Asia, aes(x = goal_3_score, fill=country)) +
+  geom_histogram() +
+  theme_minimal() +
+  scale_fill_viridis_d() +
+  labs(title = "Distributions of SDG 3 Scores",
+       x = "SDG 3 Score",
+       y = "Number of Countries",
+       fill = "Country")
+```
+
+```{r}
+ggplot(E_S_Asia, aes(x= goal_15_score, y = country)) +
+  geom_bar(stat = "identity")+
+  labs(title = "Distributions of SDG 15 Scores",
+       x = "SDG 15 Score",
+       y = "Countries",
+       fill = "Country")
+```
+```{r}
+ggplot(E_S_Asia, aes(x = goal_15_score, fill=country)) +
+  geom_histogram() +
+  theme_minimal() +
+  scale_fill_viridis_d() +
+  labs(title = "Distributions of SDG 15 Scores",
+       x = "SDG 15 Score",
+       y = "Number of Countries",
+       fill = "Country")
+```
+```{r}
+world <-ne_countries(scale = "medium", returnclass = "sf")
+```
+
+```{r}
+world <- world %>% 
+  select(name_long, iso_a3, geometry)
+```
+```{r}
+colnames(sdr_data)[which(colnames(sdr_data) == "country_code_iso3")] <- "iso_a3"
+```
+
+```{r}
+sdr_data_world_joined <- left_join(sdr_data, world, by = "iso_a3")
+```
+```{r}
+class(sdr_data_world_joined)
+```
+```{r}
+sdr_data_world_joined <- st_as_sf(sdr_data_world_joined)
+```
+```{r}
+class(sdr_data_world_joined)
+```
+```{r}
+sdr_data_world_joined <- st_transform(sdr_data_world_joined, "+proj=longlat +datum=WGS84")
+```
+
+```{r}
+mytext <- paste(
+    "Country: ", sdr_data_world_joined$country,"<br/>", 
+    "Goal 3 Score: ", round(sdr_data_world_joined$goal_3_score, 2), 
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+leaflet(sdr_data_world_joined) %>% 
+  addTiles()  %>% 
+  setView( lat=10, lng=0 , zoom=2) %>%
+  addPolygons(stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5, color = ~colorQuantile("YlOrRd", goal_3_score)(goal_3_score), label = mytext)
+```
+
+```{r}
+ggplot(E_S_Asia, aes(x = goal_11_score, 
+                     y = goal_3_score)) +
+  geom_point() +
+  geom_smooth() +
+  stat_cor() +
+  theme_minimal()+
+  labs(title = "Linear Regression between Goal 11 & 3 in East & South Asia",
+       x = "SDG 11 Score",
+       y = "SDG 3 Score",
+       fill = "Country")
+```
+```{r}
+E_S_Asia_normalized_scores <- E_S_Asia %>% 
+  select(country, contains("normalized_score"))
+```
+
+```{r}
+21*99
+```
+```{r}
+sum(is.na(E_S_Asia_normalized_scores))
+```
+```{r}
+gg_miss_var(E_S_Asia_normalized_scores, show_pct = TRUE) +
+  theme(axis.text.y = element_text(size = 8)) 
+```
+```{r}
+E_S_Asia_normalized_scores_longer <- E_S_Asia_normalized_scores %>% 
+  pivot_longer(cols = !country)
+```
+```{r}
+missing_data_by_country <- E_S_Asia_normalized_scores_longer %>%
+ group_by(country) %>%
+ miss_var_summary() %>% 
+ arrange(desc(pct_miss))
+
+missing_data_by_country
+```
+```{r}
+completely_na_countries  <- missing_data_by_country$country[missing_data_by_country$pct_miss == 100]
+completely_na_countries
+```
+```{r}
+E_S_Asia_normalized_scores_no_na_countries <- E_S_Asia_normalized_scores %>% 
+  filter(!country %in% completely_na_countries)
+```
+```{r}
+gg_miss_var(E_S_Asia_normalized_scores_no_na_countries, show_pct = TRUE) +
+  theme(axis.text.y = element_text(size = 8)) +
+  geom_hline(yintercept = 20, color = "magenta", linetype = "dashed")
+
+```
+```{r}
+E_S_Asia_less_na <- E_S_Asia_normalized_scores_no_na_countries %>%
+  select(where(~ sum(is.na(.))/length(.) <= 0.2))
+```
+
+```{r}
+E_S_Asia_imputed <- missRanger(E_S_Asia_less_na)
+```
+```{r}
+E_S_Asia_imputed <- E_S_Asia_imputed %>%
+  remove_rownames %>%
+  column_to_rownames(var="country")
+```
+
+```{r}
+fviz_nbclust(E_S_Asia_imputed, kmeans, method = "silhouette")
+```
+```{r}
+k2 <- kmeans(E_S_Asia_imputed, centers = 2)
+```
+```{r}
+fviz_cluster(k2, data = E_S_Asia_imputed) +
+  theme_minimal()
+```
+```{r}
+country_clusters <- as.data.frame(k2$cluster)
+```
+```{r}
+rf_matmort <- randomForest(normalized_score_sdg3_matmort ~ .,
+                             data = E_S_Asia_imputed,
+                             importance = TRUE)
+```
+```{r}
+rf_matmort
+```
+
+```{r}
+importance_df <- as.data.frame(rf_matmort$importance)
+```
+```{r}
+importance_df_top_10 <- importance_df %>%
+  rownames_to_column(var = "variable") %>%
+  slice_max(n = 10, order_by = `%IncMSE`)
+```
+```{r}
+ggplot(importance_df_top_10, aes(x = `%IncMSE`, y = reorder(variable, `%IncMSE`))) +
+  geom_bar(stat = "identity", fill = "magenta", color = "black") +
+  theme_minimal() +
+  labs(title = "Most Important Variables in Predicting Maternal Mortality",
+       subtitle = "Top 10",
+       y = "SDG Indicator",
+       x = "Feature Importance (% Increase in Mean Squared Error)")
+```
+```{r}
+pdp::partial(rf_matmort, pred.var = "normalized_score_sdg3_births", plot = TRUE)
+```
+```{r}
+pd <- pdp::partial(rf_matmort, pred.var = c("normalized_score_sdg3_births", "normalized_score_sdg12_ewaste"))
+```
+```{r}
+plotPartial(pd)
+```
