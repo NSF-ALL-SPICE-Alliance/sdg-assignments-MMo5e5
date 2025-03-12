@@ -17,6 +17,14 @@ library(here)
 library(janitor)
 library(leaflet)
 library(plotly)
+library(rnaturalearth)
+library(sf)
+library(ggpubr)
+library(naniar)
+library(missRanger)
+library(factoextra)
+library(randomForest)
+library(pdp)
 ```
 
 
